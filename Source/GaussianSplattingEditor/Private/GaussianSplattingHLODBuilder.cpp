@@ -9,6 +9,7 @@
 #include "GaussianSplattingEditorSettings.h"
 #include "NiagaraComponent.h"
 #include "AssetCompilingManager.h"
+#include "ContentStreaming.h"
 #include "ShaderCompiler.h"
 #include "Dom/JsonObject.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,6 +17,9 @@
 #include "LandscapeComponent.h"
 #include "GaussianSplattingEditorLibrary.h"
 #include "JsonObjectConverter.h"
+#include "Engine/Engine.h"
+#include "Engine/StaticMesh.h"
+#include "Misc/FileHelper.h"
 
 UGaussianSplattingHLODBuilderSettings::UGaussianSplattingHLODBuilderSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

@@ -13,6 +13,7 @@
 #include "GaussianSplattingEditorLibrary.h"
 #include "IContentBrowserSingleton.h"
 #include "NiagaraEditorStyle.h"
+#include "UObject/SavePackage.h"
 
 
 #define LOCTEXT_NAMESPACE "GaussianSplatting"
@@ -105,7 +106,24 @@ void FGaussianSplattingEditorModule::CreateStaticMesh(UGaussianSplattingPointClo
 		FAssetRegistryModule::AssetCreated(NewAsset);
 		FPackagePath NewPackagePath = FPackagePath::FromPackageNameChecked(NewPackage->GetName());
 		FString PackageLocalPath = NewPackagePath.GetLocalFullPath();
-		UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
+
+		FSavePackageArgs SaveArgs;
+		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		SaveArgs.SaveFlags = SAVE_NoError;
+		SaveArgs.Error = GError;
+		SaveArgs.bSlowTask = false;
+		SaveArgs.bWarnOfLongFilename = false;
+		SaveArgs.ArchiveCookData = nullptr;
+		SaveArgs.SavePackageContext = nullptr;
+		SaveArgs.InOutSaveOverrides = nullptr;
+		UPackage::SavePackage(
+			NewPackage,
+			NewAsset,
+			*PackageLocalPath,
+			SaveArgs
+		);
+		
+		// UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
 		TArray<UObject*> ObjectsToSync;
 		ObjectsToSync.Add(NewAsset);
 		GEditor->SyncBrowserToObjects(ObjectsToSync);
@@ -143,7 +161,24 @@ void FGaussianSplattingEditorModule::CreateNiagara(UGaussianSplattingPointCloud*
 		FAssetRegistryModule::AssetCreated(NewAsset);
 		FPackagePath NewPackagePath = FPackagePath::FromPackageNameChecked(NewPackage->GetName());
 		FString PackageLocalPath = NewPackagePath.GetLocalFullPath();
-		UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
+
+		FSavePackageArgs SaveArgs;
+		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		SaveArgs.SaveFlags = SAVE_NoError;
+		SaveArgs.Error = GError;
+		SaveArgs.bSlowTask = false;
+		SaveArgs.bWarnOfLongFilename = false;
+		SaveArgs.ArchiveCookData = nullptr;
+		SaveArgs.SavePackageContext = nullptr;
+		SaveArgs.InOutSaveOverrides = nullptr;
+		UPackage::SavePackage(
+			NewPackage,
+			NewAsset,
+			*PackageLocalPath,
+			SaveArgs
+		);
+		
+		// UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
 		TArray<UObject*> ObjectsToSync;
 		ObjectsToSync.Add(NewAsset);
 		GEditor->SyncBrowserToObjects(ObjectsToSync);

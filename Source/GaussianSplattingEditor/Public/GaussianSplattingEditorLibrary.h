@@ -4,6 +4,8 @@
 #include "Engine/Texture2D.h"
 #include "NiagaraSystem.h"
 #include "GaussianSplattingPointCloudDataInterface.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+
 #include "GaussianSplattingEditorLibrary.generated.h"
 
 USTRUCT(BlueprintType)

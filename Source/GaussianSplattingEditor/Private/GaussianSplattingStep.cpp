@@ -24,6 +24,11 @@
 #include "LandscapeProxy.h"
 #include <string>
 
+#include "TextureResource.h"
+#include "HAL/PlatformFileManager.h"
+#include "Misc/FileHelper.h"
+#include "UObject/SavePackage.h"
+
 DEFINE_LOG_CATEGORY(LogGaussianSplatting);
 
 class FCommandExecuteRunnable final : public FRunnable
@@ -845,11 +850,16 @@ void UGaussianSplattingStep_GaussianSplatting::Train()
 void UGaussianSplattingStep_GaussianSplatting::Train(bool bAsync, TFunction<void()> FinishedCallback /*= {}*/)
 {
 	UpdateParams();
+
+	auto HelperPath = GetDefault<UGaussianSplattingEditorSettings>()->GetGaussianSplattingHelperPath();
+	auto WorkDirStr = WorkDir;
+	auto GSRepoDir = GetDefault<UGaussianSplattingEditorSettings>()->GetGaussianSplattingRepoDir();
+	auto Params = GaussianSplattingTrainParams;
 	
 	FString Command = FString::Printf(TEXT("%s %s --gaussian %s --train=\"%s\" ")
-			, *GetDefault<UGaussianSplattingEditorSettings>()->GetGaussianSplattingHelperPath()
+			, *HelperPath
 			, *WorkDir
-			, *GetDefault<UGaussianSplattingEditorSettings>()->GetGaussianSplattingRepoDir()
+			, *GSRepoDir
 			, *GaussianSplattingTrainParams
 		);
 
@@ -910,7 +920,24 @@ void UGaussianSplattingStep_GaussianSplatting::Export()
 		FAssetRegistryModule::AssetCreated(NewAsset);
 		FPackagePath NewPackagePath = FPackagePath::FromPackageNameChecked(NewPackage->GetName());
 		FString PackageLocalPath = NewPackagePath.GetLocalFullPath();
-		UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
+
+		FSavePackageArgs SaveArgs;
+		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		SaveArgs.SaveFlags = SAVE_NoError;
+		SaveArgs.Error = GError;
+		SaveArgs.bSlowTask = false;
+		SaveArgs.bWarnOfLongFilename = false;
+		SaveArgs.ArchiveCookData = nullptr;
+		SaveArgs.SavePackageContext = nullptr;
+		SaveArgs.InOutSaveOverrides = nullptr;
+		UPackage::SavePackage(
+			NewPackage,
+			NewAsset,
+			*PackageLocalPath,
+			SaveArgs
+		);
+		
+		// UPackage::SavePackage(NewPackage, NewAsset, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
 		TArray<UObject*> ObjectsToSync;
 		ObjectsToSync.Add(NewAsset);
 		GEditor->SyncBrowserToObjects(ObjectsToSync);

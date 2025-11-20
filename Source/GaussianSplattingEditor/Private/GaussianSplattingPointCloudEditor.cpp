@@ -6,6 +6,8 @@
 #include "AdvancedPreviewSceneModule.h"
 #include "SGaussianSplattingPointCloudFeatureEditor.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include "PropertyEditorModule.h"
+#include "Modules/ModuleManager.h"
 
 #define LOCTEXT_NAMESPACE "GaussianSplatting"
 
@@ -17,7 +19,7 @@ const FName FGaussianSplattingPointCloudEditor::FeatureEditorTabId(TEXT("Gaussia
 
 FGaussianSplattingPointCloudEditor::~FGaussianSplattingPointCloudEditor()
 {
-	GEditor->UnregisterForUndo(this);
+	// GEditor->UnregisterForUndo(this);
 }
 
 UGaussianSplattingPointCloud* FGaussianSplattingPointCloudEditor::GetPointCloud()
@@ -74,7 +76,7 @@ void FGaussianSplattingPointCloudEditor::InitEditor(const EToolkitMode::Type Mod
 	const bool bCreateDefaultToolbar = true;
 	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GaussianSplattingPointCloudEditorAppIdentifier, StandaloneDefaultLayout, bCreateDefaultToolbar, bCreateDefaultStandaloneMenu, ObjectToEdit);
 
-	GEditor->RegisterForUndo(this);
+	// GEditor->RegisterForUndo(this);
 }
 
 void FGaussianSplattingPointCloudEditor::SelectPointsByIndex(TArray<uint32> InIndices)

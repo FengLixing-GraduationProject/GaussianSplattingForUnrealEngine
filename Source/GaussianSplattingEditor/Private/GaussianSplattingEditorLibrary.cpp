@@ -29,6 +29,11 @@
 #include <string>
 #include <cmath>
 
+#include "Framework/Application/SlateApplication.h"
+#include "HAL/PlatformFileManager.h"
+#include "Misc/FileHelper.h"
+#include "UObject/SavePackage.h"
+
 constexpr float ColourCoef = 0.28209479177387814;
 
 UGaussianSplattingPointCloud* UGaussianSplattingEditorLibrary::LoadSplatPly(FString FileName, UObject* Outer, FName AssetName /*= NAME_None*/)
@@ -555,7 +560,22 @@ void UGaussianSplattingEditorLibrary::ImportPointClouds(UWorld* World, FString S
 		FAssetRegistryModule::AssetCreated(PointCloud);
 		FPackagePath PackagePath = FPackagePath::FromPackageNameChecked(NewPackage->GetName());
 		FString PackageLocalPath = PackagePath.GetLocalFullPath();
-		UPackage::SavePackage(NewPackage, PointCloud, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
+
+		FSavePackageArgs SaveArgs;
+		SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		SaveArgs.SaveFlags = SAVE_NoError;
+		SaveArgs.Error = GError;
+		SaveArgs.bSlowTask = false;
+		SaveArgs.bWarnOfLongFilename = false;
+		SaveArgs.ArchiveCookData = nullptr;
+		SaveArgs.SavePackageContext = nullptr;
+		SaveArgs.InOutSaveOverrides = nullptr;
+		UPackage::SavePackage(
+			NewPackage,
+			PointCloud,
+			*PackageLocalPath,
+			SaveArgs
+		);
 
 		PointClouds.Add({ PointCloud, PlyInfo.Value.Location });
 	}
@@ -669,7 +689,24 @@ void UGaussianSplattingEditorLibrary::RepartitionPointClouds(UWorld* World, FStr
 			FAssetRegistryModule::AssetCreated(PointCloud);
 			FPackagePath PackagePath = FPackagePath::FromPackageNameChecked(Package->GetName());
 			FString PackageLocalPath = PackagePath.GetLocalFullPath();
-			UPackage::SavePackage(Package, PointCloud, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
+
+			FSavePackageArgs SaveArgs;
+			SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+			SaveArgs.SaveFlags = SAVE_NoError;
+			SaveArgs.Error = GError;
+			SaveArgs.bSlowTask = false;
+			SaveArgs.bWarnOfLongFilename = false;
+			SaveArgs.ArchiveCookData = nullptr;
+			SaveArgs.SavePackageContext = nullptr;
+			SaveArgs.InOutSaveOverrides = nullptr;
+			UPackage::SavePackage(
+				Package,
+				PointCloud,
+				*PackageLocalPath,
+				SaveArgs
+			);
+			
+			// UPackage::SavePackage(Package, PointCloud, RF_Public | RF_Standalone, *PackageLocalPath, GError, nullptr, false, true, SAVE_NoError);
 			RepartitionPointClouds.Add(PointCloud, CellLocation);
 		}
 	}

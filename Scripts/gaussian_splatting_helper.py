@@ -78,11 +78,13 @@ class GaussianSplattingHelper:
 
         # self.runCommand(f"{self.args.colmap} point_triangulator --database_path database.db --image_path images --input_path ./text --output_path ./pointtriangulator --Mapper.fix_existing_images 1 --Mapper.ba_refine_focal_length 0")
         
-        command = f"{self.args.colmap} mapper --database_path ./database.db --image_path ./images --output_path ./sparse  --Mapper.fix_existing_images 1 "
+        # command = f"{self.args.colmap} mapper --database_path ./database.db --image_path ./images --output_path ./sparse  --Mapper.fix_existing_images 1 "
+        command = f"{self.args.colmap} mapper --database_path ./database.db --image_path ./images --output_path ./sparse "
         if self.args.mapper:
             command += str(self.args.mapper);
         self.runCommand(command)
         
+        # command = f"{self.args.colmap} model_aligner --input_path ./sparse/0 --output_path ./sparse/0 --ref_images_path ./cameras.txt --ref_is_gps 0 --alignment_type custom --alignment_max_error 3 --output_type BIN"
         command = f"{self.args.colmap} model_aligner --input_path ./sparse/0 --output_path ./sparse/0 --ref_images_path ./cameras.txt --ref_is_gps 0 --alignment_type custom --alignment_max_error 3 "
         if self.args.aligner:
             command += str(self.args.aligner);
@@ -111,9 +113,11 @@ class GaussianSplattingHelper:
         self.runCommand(command, env)
 
     def executeGaussianSplatting(self):
-        command = "conda activate gaussian_splatting"
+        # command = "conda activate gaussian_splatting"
+        command = ""
         if os.path.exists("./depths"):
-            command += f"&& python {self.scriptDir}/make_depth_scale.py --base_dir . --depths_dir ./depths && python {self.args.gaussian}/train.py -s . -m ./output --depths ./depths "
+            command += f"python {self.scriptDir}/make_depth_scale.py --base_dir . --depths_dir ./depths && python {self.args.gaussian}/train.py -s . -m ./output --depths ./depths "
+            # command += f"&& python {self.scriptDir}/make_depth_scale.py --base_dir . --depths_dir ./depths && python {self.args.gaussian}/train.py -s . -m ./output --depths ./depths "
         else:
             command += f"&& python {self.args.gaussian}/train.py -s . -m ./output "
         if self.args.train:
@@ -121,4 +125,4 @@ class GaussianSplattingHelper:
         self.runCommand(command)
 
 if __name__ == "__main__":
-    GaussianSplattingHelper = GaussianSplattingHelper()
+    gs_helper = GaussianSplattingHelper()
